@@ -1,0 +1,161 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Resources": {
+
+  	"devVPC": {
+  	  "Type": "AWS::EC2::VPC",
+  	  "Properties": {
+  	    "CidrBlock": "10.0.0.0/16",
+  	    "Tags": [ { "Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "AWS::StackName"}}]
+  	  }
+  	},
+
+  	"devRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : {"Ref" : "devVPC"},
+        "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "AWS::StackName"}}]
+      }
+    },
+
+    "devIGW": {
+    	  "Type": "AWS::EC2::InternetGateway",
+    	  "Properties": {
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "AWS::StackName"}}]
+      }
+    },
+
+    "AttachGateway": {
+    	  "Type": "AWS::EC2::VPCGatewayAttachment",
+    	  "Properties": {
+    	    "VpcId": { "Ref" : "devVPC" },
+    	    "InternetGatewayId": { "Ref": "devIGW" }
+      }
+    },
+
+     "devIGWRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "devRouteTable" },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : { "Ref" : "devIGW" }
+      }
+    },
+
+    "devPublicSubnet1a": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2a", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.128.0/20",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPublicSubnet_1a"}]
+         }
+       },
+
+    "devPublicSubnet1b": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2b", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.144.0/20",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPublicSubnet_1b"}]
+         }
+       },
+
+    "devPublicSubnet1c": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2c", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.160.0/20",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPublicSubnet_1c"}]
+         }
+       },
+
+    "SubnetRouteTableAssociationpublicwesta" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "devPublicSubnet1a" },
+        "RouteTableId" : { "Ref" : "devRouteTable" }
+      }
+    },
+
+    "SubnetRouteTableAssociationpublicwestb" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "devPublicSubnet1b" },
+        "RouteTableId" : { "Ref" : "devRouteTable" }
+      }
+    },
+
+    "SubnetRouteTableAssociationpublicwestc" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "devPublicSubnet1c" },
+        "RouteTableId" : { "Ref" : "devRouteTable" }
+      }
+    },
+
+    "devPrivateSubnet1a": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2a", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.0.0/19",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPrivateSubnet_1a"}]
+         }
+       },
+
+    "devPrivateSubnet1b": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2b", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.32.0/19",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPrivateSubnet_1b"}]
+         }
+       },
+
+    "devPrivateSubnet1c": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2c", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.64.0/19",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPrivateSubnet_1c"}]
+         }
+    },
+
+    "devDBPrivateSubnet1a": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2a", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.192.0/21",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devDBPrivateSubnet_1a"}]
+         }
+       },
+
+    "devDBPrivateSubnet1b": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2b", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.200.0/21",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devDBPrivateSubnet_1b"}]
+         }
+       },
+
+    "devDBPrivateSubnet1c": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : "us-west-2c", 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.208.0/21",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devDBPrivateSubnet_1c"}]
+         }
+    }    
+  }  
+}
