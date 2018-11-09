@@ -1,0 +1,82 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Resources": {
+
+  	"devVPC": {
+  	  "Type": "AWS::EC2::VPC",
+  	  "Properties": {
+  	    "CidrBlock": "10.0.0.0/16",
+  	    "Tags": [ { "Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "AWS::StackName"}}]
+  	  }
+  	},
+
+  	"devRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : {"Ref" : "devVPC"},
+        "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "AWS::StackName"}}]
+      }
+    },
+
+    "devIGW": {
+    	  "Type": "AWS::EC2::InternetGateway",
+    	  "Properties": {
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "AWS::StackName"}}]
+      }
+    },
+
+    "AttachGateway": {
+    	  "Type": "AWS::EC2::VPCGatewayAttachment",
+    	  "Properties": {
+    	    "VpcId": { "Ref" : "devVPC" },
+    	    "InternetGatewayId": { "Ref": "devIGW" }
+      }
+    },
+
+     "devIGWRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "DependsOn" : "AttachGateway",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "devRouteTable" },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : { "Ref" : "devIGW" }
+      }
+    },
+
+    "devPublicSubnet": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": { 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.1.0/20",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPublicSubnet"}]
+         }
+       },
+
+    "SubnetRouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "devPublicSubnet" },
+        "RouteTableId" : { "Ref" : "devRouteTable" }
+      }
+    },
+
+    "devPrivateSubnet": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": { 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.16.0/20",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devPrivateSubnet"}]
+         }
+       },
+
+    "devDBPrivateSubnet": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": { 
+           "VpcId": { "Ref" : "devVPC" },
+           "CidrBlock": "10.0.32.0/20",
+    	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devDBPrivateSubnet"}]
+         }
+       }           
+  }
+}
