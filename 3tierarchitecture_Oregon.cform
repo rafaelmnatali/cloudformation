@@ -1,6 +1,8 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
 
+  "Description": "This template creates a VPC with a Public, a Private, and a Database Private Subnet in the Oregon Region (us-west2) using all 3 Availability Zone. It's a common 3 tier architecture. No resources such as EC2 or RDS are provisioned; only the network infrastructure: VPC, IGW, RouteTable, Subnets.", 
+
   "Resources": {
 
   	"devVPC": {
