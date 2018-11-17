@@ -1,0 +1,95 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description": "This template defines the network parameters for a new 3 tier VPC w/ 2 public, private, and database private subnets", 
+  "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "AvailabilityZones",
+                        "VPCCIDR",
+                        "PrivateSubnet1",
+                        "PrivateSubnet2"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "AvailabilityZones": {
+                    "default": "Availability Zones"
+                },
+                "VPCCIDR": {
+                    "default": "VPC CIDR"
+                },
+                "PrivateSubnet1":{
+                    "default": "Private Subnet 1 CIDR"
+                },
+                "PrivateSubnet2":{
+                    "default": "Private Subnet 2 CIDR"
+                },                     
+            }
+        }
+    },
+    "Parameters": {
+        "AvailabilityZones": {
+            "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved and only 2 AZs are used for this deployment.",
+            "Type": "List<AWS::EC2::AvailabilityZone::Name>"
+        },
+        "PrivateSubnet1CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.0.0/19",
+            "Description": "CIDR block for private subnet 1 located in Availability Zone 1.",
+            "Type": "String"
+        },
+        "PrivateSubnet2CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.32.0/19",
+            "Description": "CIDR block for private subnet 2 located in Availability Zone 2.",
+            "Type": "String"
+        },        
+        "VPCCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.0.0/16",
+            "Description": "CIDR Block for the VPC",
+            "Type": "String"
+        }
+    },
+  "Resources": {
+
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": { "Ref" : "VPCCIDR" },
+        "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "AWS::StackName"}}]
+      }
+    },
+
+    "PrivateSubnet1": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : { "Fn::Select" : [ "0", { "Ref" : "AvailabilityZones"}]}, 
+           "VpcId": { "Ref" : "VPC" },
+           "CidrBlock": { "Ref" : "PrivateSubnet1CIDR"},
+           "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "Private"}]
+         },
+         "DependsOn" : "VPC"
+       },
+
+    "PrivateSubnet2": {
+         "Type": "AWS::EC2::Subnet",
+         "Properties": {
+           "AvailabilityZone" : { "Fn::Select" : [ "1", { "Ref" : "AvailabilityZones"}]},
+           "VpcId": { "Ref" : "VPC" },
+           "CidrBlock": { "Ref" : "PrivateSubnet2CIDR"},
+           "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "Private"}]
+         },
+         "DependsOn" : "VPC"
+       },       
+  }                
+}        
