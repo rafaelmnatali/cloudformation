@@ -158,6 +158,15 @@
            "CidrBlock": "10.0.208.0/21",
     	    "Tags": [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "devDBPrivateSubnet_1c"}]
          }
-    }    
-  }  
+    },
+    "RDSDBSubnetGroup": {
+         "Type" : "AWS::RDS::DBSubnetGroup",
+         "Properties" : {
+               "DBSubnetGroupDescription" : "Create DBSubnetGroup for RDS",
+               "DBSubnetGroupName" : "RDSDBSubnet",
+               "SubnetIds" : [ {"Ref" : "devDBPrivateSubnet1a" }, {"Ref" : "devDBPrivateSubnet1b" }, {"Ref" : "devDBPrivateSubnet1c" }],
+               "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "RDSDBSubnetGroup"}]
+         }    
+    }
+}      
 }
