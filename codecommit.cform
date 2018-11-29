@@ -1,0 +1,226 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description": "This template creates CodeCommit repositories for Subversion repositories that were migrated from CloudBees.", 
+
+  "Resources": {
+    
+    "cbsvnadsmanagerrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_adsmanager"
+  			}
+    },
+
+    "cbsvnfutbalondocumentacionrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_futbalondocumentacion"
+  			}
+    },
+
+    "cbsvndirectoriodelpueblorepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_directoriodelpueblo"
+  			}
+    },
+
+    "cbsvndotnetrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_dotnet"
+  			}
+    },
+
+    "cbsvnfutbalonrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_futbalon"
+  			}
+    },
+
+	"cbsvnfutbalon2repo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_futbalon2"
+  			}
+    },
+ 
+	"cbsvnFutbalonTriviarepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_FutbalonTrivia"
+  			}
+    },
+
+	"cbsvnProyectoPuertasrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_ProyectoPuertas"
+  			}
+    },
+
+	"cbsvnRutaUnoApprepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_RutaUnoApp"
+  			}
+    },
+ 
+	"cbsvnSCUrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_SCU"
+  			}
+    },
+
+	"cbsvntaskswebrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_tasks-web"
+  			}
+    },
+ 
+	"cbsvntasksrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_tasks"
+  			}
+    },
+
+	"cbsvnubicameandroidadminrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_ubicame-android-admin"
+  			}
+    },
+
+	"cbsvnubicamebackendrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_ubicame-backend"
+  			}
+    },
+
+	"cbsvnubicamewebrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_ubicameweb"
+  			}
+    },
+ 
+	"cbsvnvaperepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Subversion repository migrated from CloudBees",
+    			"RepositoryName" : "cb_svn_vape"
+  			}
+    }    
+  },
+
+  "Outputs": {
+  	
+  	"cbsvnadsmanager" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnadsmanagerrepo", "CloneUrlHttp"]}
+  	},
+	
+	"cbsvnfutbalondocumentacion" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnfutbalondocumentacionrepo", "CloneUrlHttp"]}
+  	},
+
+  	"cbsvndirectoriodelpueblo" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvndirectoriodelpueblorepo", "CloneUrlHttp"]}
+  	},
+
+  	"cbsvndotnet" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvndotnetrepo", "CloneUrlHttp"]}
+  	},
+
+  	"cbsvnfutbalon" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnfutbalonrepo", "CloneUrlHttp"]}  		
+  	},
+
+  	"cbsvnfutbalon2" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnfutbalon2repo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnFutbalonTrivia" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnFutbalonTriviarepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnProyectoPuertas" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnProyectoPuertasrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnRutaUnoApp" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnRutaUnoApprepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnSCU" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnSCUrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvntasksweb" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvntaskswebrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvntasks" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvntasksrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvntasks" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvntasksrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnubicameandroidadmin" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnubicameandroidadminrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnubicamebackend" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnubicamebackendrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnubicameweb" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnubicamewebrepo", "CloneUrlHttp"]}	
+  	},
+
+  	"cbsvnvape" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "cbsvnvaperepo", "CloneUrlHttp"]}	
+  	}
+
+  }
+
+} 
