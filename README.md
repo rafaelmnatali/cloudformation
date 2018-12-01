@@ -5,4 +5,4 @@ In this project I'll upload the cloud formation templates that I'm currently wor
 
 Look for the following repositories for final versions:
 
-# codecommit - interactions with AWS CodeCommit
+codecommit - interactions with AWS CodeCommit
