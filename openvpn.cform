@@ -68,7 +68,20 @@
 				}
 		},
 
-		"PublicSubnetNACLPublicAccess22egress1" : { 
+	    "PublicSubnetNACLPublicAccess22egressPrivateSubnet1" : {
+	    	"Type" : "AWS::EC2::NetworkAclEntry",
+			"Properties": {
+				"NetworkAclId" : { "Ref" : "PublicNACL"},
+				"RuleNumber" : "500",
+				"Protocol" : "6",
+				"PortRange" : { "From" : "22", "To" : "22" },
+				"Egress" : "false",
+				"RuleAction" : "allow",
+				"CidrBlock" : "10.0.0.0/19"
+				}
+		},
+
+		"PublicSubnetNACLPublicAccess22egressPrivateSubnet2" : { 
 			"Type" : "AWS::EC2::NetworkAclEntry",
 			"Properties": {
 				"NetworkAclId" : { "Ref" : "PublicNACL"},
@@ -77,20 +90,7 @@
 				"PortRange" : { "From" : "22", "To" : "22" },
 				"Egress" : "true",
 				"RuleAction" : "allow",
-				"CidrBlock" : "10.0.0.0/19"
-				}
-		},
-
-		"PublicSubnetNACLPublicAccess22egress2" : { 
-			"Type" : "AWS::EC2::NetworkAclEntry",
-			"Properties": {
-				"NetworkAclId" : { "Ref" : "PublicNACL"},
-				"RuleNumber" : "600",
-				"Protocol" : "6",
-				"PortRange" : { "From" : "22", "To" : "22" },
-				"Egress" : "true",
-				"RuleAction" : "allow",
-				"CidrBlock" : "10.0.0.32/19"
+				"CidrBlock" : "10.0.32.0/19"
 				}
 		},
 
@@ -113,37 +113,37 @@
 		    			"CidrIp": "0.0.0.0/0",
 		    			"Description": "Public access to port 1194"
 		    		}
-		    	],
-		    "SecurityGroupEgress": [
-                {
-                    "IpProtocol": "17",
-                    "FromPort": "1024",
-                    "ToPort": "65535",
-                    "CidrIp": "0.0.0.0/0",
-                    "Description": "Allow access to UDP ephemeral ports"
-                },
-                {
-                    "IpProtocol": "6",
-                    "FromPort": "1024",
-                    "ToPort": "65535",
-                    "CidrIp": "0.0.0.0/0",
-                    "Description": "Allow access to TCP ephemeral ports"
-                },
-                {
-                    "IpProtocol": "6",
-                    "FromPort": "22",
-                    "ToPort": "22",
-                    "CidrIp": "10.0.32.0/19",
-                    "Description": "Allow access to SSH to Private Subnet 2"
-                },
-                {
-                    "IpProtocol": "6",
-                    "FromPort": "22",
-                    "ToPort": "22",
-                    "CidrIp": "10.0.0.0/19",
-                    "Description": "Allow access to SSH to Private Subnet 1"
-                },    
-            ],
+		    ],
+		    "SecurityGroupEgress" : [
+		    		{ 
+		    			"IpProtocol": "17",
+		    			"FromPort": "1024",
+		    			"ToPort": "65535",
+		    			"CidrIp": "0.0.0.0/0",
+		    			"Description": "Allow access to UDP ephemeral ports"
+		    		},
+		    		{ 
+		    			"IpProtocol": "6",
+		    			"FromPort": "1024",
+		    			"ToPort": "65535",
+		    			"CidrIp": "0.0.0.0/0",
+		    			"Description": "Allow access to TCP ephemeral ports"
+		    		},
+		    		{ 
+		    			"IpProtocol": "6",
+		    			"FromPort": "22",
+		    			"ToPort": "22",
+		    			"CidrIp": "10.0.0.0/19",
+		    			"Description": "Allow access to SSH from Private Subnet 1"
+		    		},
+		    		{ 
+		    			"IpProtocol": "6",
+		    			"FromPort": "22",
+		    			"ToPort": "22",
+		    			"CidrIp": "10.0.32.0/19",
+		    			"Description": "Allow access to SSH from Private Subnet 2"
+		    		}
+		    ],
 		    "VpcId" : { "Fn::Select" : [ "0", { "Ref" : "VpcId"}]},
 		    "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "sg_openvpn"}]
 		  }
