@@ -59,7 +59,17 @@
 
             "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "OpenVPN-Server"}]
          }
-      }
+      },
+
+    "ElasticIPAssociation" : {
+      "Type" : "AWS::EC2::EIPAssociation",
+      "Properties" : {
+        "InstanceId" : {"Ref" : "EC2Instance"},
+        "EIP" : {"Ref" : "ElasticIPid"}
+      },
+      "DependsOn" : "EC2Instance"
+    }
+
    }
 }
       
