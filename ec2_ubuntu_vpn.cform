@@ -41,7 +41,8 @@
             "SecurityGroupIds" : ["sg-0084ff082aa9892a3"],
             "SubnetId" : "subnet-13503169",
             "InstanceType" : "t2.micro",
-            "SourceDestCheck" : False,            
+            "SourceDestCheck" : False,
+            "IamInstanceProfile" : "natali_ec2_fullaccess",            
             "UserData": {
                  "Fn::Base64": { "Fn::Join":["", [
                    "#!/bin/bash -ex\n",
@@ -53,7 +54,13 @@
                    "apt-get update && apt-get install -y openvpn\n",
                    "/home/ubuntu/openvpn-server-vagrant/openvpn.sh\n",
                    "sed '143 a push \"route 10.0.0.0 255.255.0.0\"' /etc/openvpn/server.conf -i\n",
-                   "systemctl restart openvpn@server\n"
+                   "systemctl restart openvpn@server\n",
+                   "apt install -y awscli\n",
+                   "aws s3 cp s3://natalilogs/users.txt /home/ubuntu/openvpn-server-vagrant/\n",
+                   "aws s3 cp s3://natalilogs/centauro_users.sh /home/ubuntu/openvpn-server-vagrant/\n",
+                   "chmod +x /home/ubuntu/openvpn-server-vagrant/centauro_users.sh\n",
+                   "cd /home/ubuntu/openvpn-server-vagrant\n",
+                   "./centauro_users.sh\n"
                  ]]}
                },
 
