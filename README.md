@@ -7,5 +7,8 @@ Look for the following repositories for final versions:
 
 * codecommit - interactions with AWS CodeCommit
 * openvpn - install and configure an EC2 instance with OpenVPN community edition.
-* dynamodb-table-ondemand - create a DynamoDB table with On-Demand capacity instead of Provisioned capacity
-* ddns - to create a serverless solution to dynamically register EC2 instances in Route53. Based on https://github.com/awslabs/aws-lambda-ddns-function
+
+Templates OK:
+
+* dynamodb-table-ondemand.cform - create a DynamoDB table with On-Demand capacity instead of Provisioned capacity
+* ddns.cform - to create a serverless solution to dynamically register EC2 instances in Route53. Based on https://github.com/awslabs/aws-lambda-ddns-function
