@@ -12,3 +12,4 @@ Templates OK:
 
 * dynamodb-table-ondemand.cform - create a DynamoDB table with On-Demand capacity instead of Provisioned capacity
 * ddns.cform - to create a serverless solution to dynamically register EC2 instances in Route53. Based on https://github.com/awslabs/aws-lambda-ddns-function
+* ec2_latestAMI - to create an EC2 instance with latest Amazon Linux 2 AMI available in the region
