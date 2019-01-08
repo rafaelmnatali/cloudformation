@@ -138,7 +138,7 @@
 		            "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
 		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
 		            "InstanceType" : { "Ref" : "InstanceType" },    
-		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName"}}]
+		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "CNAME", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}, ".rmnatali.net"]]}}]
 		    }
 		},
 
@@ -151,7 +151,7 @@
                     "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
                     "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
                     "InstanceType" : { "Ref" : "InstanceType" },    
-                    "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName"}}]
+                    "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "CNAME", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}, ".rmnatali.net"]]}}]
             }
         }
 
