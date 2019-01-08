@@ -1,28 +1,45 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
 
-	  "Description": "This template creates an EC2 instance with the latest Linux 2 AMI", 
+	  "Description": "This template creates an EC2 instance by default with the latest Linux 2 AMI or Windows 2016 AMI", 
   	  
   	  "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
                 {
                     "Label": {
-                        "default": "EC2 Configuration"
+                        "default": "EC2 Network Configuration"
                     },
                     "Parameters": [
-                    	"VPC",
-                        "Subnet",
+                        "VpcId",
+                        "SubnetId"         
+                    ]
+                },            
+                {
+                    "Label": {
+                        "default": "EC2 Instance Configuration"
+                    },
+                    "Parameters": [
+                        "EnvType",
+                    	"InstanceType",
                         "ServerName",
+                        "SecurityGroupId",
+                        "KeyName"       
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "ImageId - DO NOT CHANGE unless an ImageId other than the latest is required"
+                    },
+                    "Parameters": [
                         "LatestLinuxAMI",
-                        "SecurityGroup",
-                        "KeyName"                   
+                        "LatestWindowsAMI"
                     ]
                 }
             ],
             "ParameterLabels": {
             	"VpcId": {
-            		"default" : "VPC id"
+            		"default" : "Enter the VPC where to host the Server"
             	},
 
                 "Subnet": {
@@ -34,7 +51,11 @@
                 },
 
                 "LatestLinuxAMI" : {
-                	"default": "Linux AMI"
+                	"default": "Latest Amazon Linux 2 AMI"
+                },
+
+                "LatestWindowsAMI" : {
+                    "default": "Latest Windows 2016 AMI"
                 },
 
                 "SecurityGroup" : {
@@ -42,14 +63,22 @@
                 },
 
                 "KeyName" : {
-                	"default": "KeyName"
+                	"default": "Select the appropriate KeyPair for this instance"
                 }               
             }
         }
     },
     "Parameters": {
+        "EnvType" : {
+            "Description" : "Operating System",
+            "Default" : "Linux",
+            "Type" : "String",
+            "AllowedValues" : ["Linux", "Windows"],
+            "ConstraintDescription" : "must specify Linux or Windows"
+        },
+
     	"VpcId": {
-    		"Description": "Enter the VPC where to configure OpenVPN",
+    		"Description": "Enter the VPC where to configure the Server",
     		"Type": "List<AWS::EC2::VPC::Id>"
     	},
 
@@ -66,6 +95,11 @@
         "LatestLinuxAMI": {
         	"Type":  "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
         	"Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+        },
+
+        "LatestWindowsAMI": {
+            "Type":  "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+            "Default": "/aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base"
         },
 
         "SecurityGroupId": {
@@ -88,11 +122,16 @@
 
     },
 
+    "Conditions" : {
+      "CreateLinuxEC2"   : {"Fn::Equals" : [{"Ref" : "EnvType"}, "Linux"]},
+      "CreateWindowsEC2" : {"Fn::Equals" : [{"Ref" : "EnvType"}, "Windows"]}
+    },
 
 	"Resources": {
 
-		"EC2Instance" : {
+		"LinuxEC2Instance" : {
 			"Type" : "AWS::EC2::Instance",
+            "Condition" : "CreateLinuxEC2",
 			"Properties" : {
 				"ImageId" : { "Ref" : "LatestLinuxAMI" },
 		            "KeyName" : { "Ref" : "KeyName" },
@@ -101,6 +140,20 @@
 		            "InstanceType" : { "Ref" : "InstanceType" },    
 		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName"}}]
 		    }
-		}
+		},
+
+        "WindowsEC2Instance" : {
+            "Type" : "AWS::EC2::Instance",
+            "Condition" : "CreateWindowsEC2",
+            "Properties" : {
+                "ImageId" : { "Ref" : "LatestWindowsAMI" },
+                    "KeyName" : { "Ref" : "KeyName" },
+                    "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
+                    "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
+                    "InstanceType" : { "Ref" : "InstanceType" },    
+                    "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName"}}]
+            }
+        }
+
 	}
 }	
