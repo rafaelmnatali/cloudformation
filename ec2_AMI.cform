@@ -1,7 +1,7 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
 
-	  "Description": "This template creates an EC2 instance by default with the latest Linux 2 AMI or Windows 2016 AMI", 
+	  "Description": "This template creates an EC2 instance with specified Linux or Windows AMI", 
   	  
   	  "Metadata": {
         "AWS::CloudFormation::Interface": {
@@ -29,11 +29,11 @@
                 },
                 {
                     "Label": {
-                        "default": "ImageId - DO NOT CHANGE unless an ImageId other than the latest is required"
+                        "default": "ImageId required for the EC2 instance"
                     },
                     "Parameters": [
-                        "LatestLinuxAMI",
-                        "LatestWindowsAMI"
+                        "LinuxAMI",
+                        "WindowsAMI"
                     ]
                 }
             ],
@@ -50,12 +50,12 @@
                 	"default": "Server Name"
                 },
 
-                "LatestLinuxAMI" : {
-                	"default": "Latest Amazon Linux 2 AMI"
+                "LinuxAMI" : {
+                	"default": "Linux AMI"
                 },
 
-                "LatestWindowsAMI" : {
-                    "default": "Latest Windows 2016 AMI"
+                "WindowsAMI" : {
+                    "default": "Windows AMI"
                 },
 
                 "SecurityGroup" : {
@@ -92,14 +92,12 @@
         	"Type": "String"
         },
 
-        "LatestLinuxAMI": {
-        	"Type":  "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
-        	"Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+        "LinuxAMI": {
+        	"Type":  "String"
         },
 
-        "LatestWindowsAMI": {
-            "Type":  "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
-            "Default": "/aws/service/ami-windows-latest/Windows_Server-2016-English-Full-Base"
+        "WindowsAMI": {
+            "Type":  "String"
         },
 
         "SecurityGroupId": {
@@ -115,8 +113,8 @@
         "InstanceType": {
             "Description": "Select the appropriate instance type",
             "Type": "String",
-            "Default": "t2.nano",
-            "AllowedValues": ["t2.nano", "t2.micro"],
+            "Default": "t3.micro",
+            "AllowedValues": ["t3.micro", "t3.small", "t3.medium"],
             "ConstraintDescription": "Must be a valid EC2 instance type"
         }            
 
@@ -133,12 +131,13 @@
 			"Type" : "AWS::EC2::Instance",
             "Condition" : "CreateLinuxEC2",
 			"Properties" : {
-				"ImageId" : { "Ref" : "LatestLinuxAMI" },
+				"ImageId" : { "Ref" : "LinuxAMI" },
 		            "KeyName" : { "Ref" : "KeyName" },
 		            "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
 		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
-		            "InstanceType" : { "Ref" : "InstanceType" },    
-		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}]]}}, { "Key" : "CNAME", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}, ".rmnatali.net."]]}}]
+		            "InstanceType" : { "Ref" : "InstanceType" },
+                    "IamInstanceProfile" : "CloudWatchAgentServerRole",    
+		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}]]}}, { "Key" : "CNAME", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}, ".centauro.net."]]}}]
 		    }
 		},
 
@@ -146,12 +145,13 @@
             "Type" : "AWS::EC2::Instance",
             "Condition" : "CreateWindowsEC2",
             "Properties" : {
-                "ImageId" : { "Ref" : "LatestWindowsAMI" },
+                "ImageId" : { "Ref" : "WindowsAMI" },
                     "KeyName" : { "Ref" : "KeyName" },
                     "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
                     "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
                     "InstanceType" : { "Ref" : "InstanceType" },    
-                    "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}]]}}, { "Key" : "CNAME", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}, ".rmnatali.net"]]}}]
+                    "IamInstanceProfile" : "CloudWatchAgentServerRole",
+                    "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}]]}}, { "Key" : "CNAME", "Value" : {"Fn::Join": ["", [{ "Ref" : "ServerName"}, ".centauro.net."]]}}]
             }
         }
 

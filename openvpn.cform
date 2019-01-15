@@ -1,7 +1,7 @@
 {
 	"AWSTemplateFormatVersion" : "2010-09-09",
 
-	  "Description": "This template defines the network parameters for a new 3 tier VPC with 2 public, private, and database private subnets", 
+	  "Description": "This template install and configure a OpenVPN Server", 
   	  
   	  "Metadata": {
         "AWS::CloudFormation::Interface": {
@@ -64,11 +64,11 @@
 			"Type" : "AWS::EC2::Instance",
 			"Properties" : {
 				"ImageId" : "ami-0f9cf087c1f27d9b1",
-		            "KeyName" : "openvpn-virginia",
+		            "KeyName" : "centauro-virginia",
 		            "SecurityGroupIds" : [ { "Ref" : "OpenVPNSecurityGroup"}],
 		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "PublicSubnet"}]},
-		            "InstanceType" : "t2.micro",
-		            "IamInstanceProfile" : "natali_ec2_fullaccess",
+		            "InstanceType" : "t3.medium",
+		            "IamInstanceProfile" : "role_S3_openvpn",
 		            "SourceDestCheck" : "False",            
 		            "UserData": {
 		                 "Fn::Base64": { "Fn::Join":["", [
@@ -82,11 +82,11 @@
 		                   "/home/ubuntu/openvpn-server-vagrant/openvpn.sh\n",
 		                   "sed '143 a push \"route 10.0.0.0 255.255.0.0\"' /etc/openvpn/server.conf -i\n",
 		                   "sed '203 a push \"dhcp-option DNS 10.0.0.2\"' /etc/openvpn/server.conf -i\n",
-		                   "sed '204 a push \"dhcp-option DOMAIN rmnatali.net\"' /etc/openvpn/server.conf -i\n",
+		                   "sed '204 a push \"dhcp-option DOMAIN centauro.net\"' /etc/openvpn/server.conf -i\n",
 		                   "systemctl restart openvpn@server\n",
 		                   "apt install -y awscli\n",
-		                   "aws s3 cp s3://natalilogs/users.txt /home/ubuntu/openvpn-server-vagrant/\n",
-		                   "aws s3 cp s3://natalilogs/centauro_users.sh /home/ubuntu/openvpn-server-vagrant/\n",
+		                   "aws s3 cp s3://centauro-cloudformation/openvpn_us-east-1_vpn/files/users.txt /home/ubuntu/openvpn-server-vagrant/\n",
+		                   "aws s3 cp s3://centauro-cloudformation/openvpn_us-east-1_vpn/files/centauro_users.sh /home/ubuntu/openvpn-server-vagrant/\n",
 		                   "chmod +x /home/ubuntu/openvpn-server-vagrant/centauro_users.sh\n",
 		                   "cd /home/ubuntu/openvpn-server-vagrant\n",
 		                   "./centauro_users.sh\n"

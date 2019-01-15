@@ -1,0 +1,111 @@
+
+{
+   "AWSTemplateFormatVersion" : "2010-09-09",
+
+     "Description": "This template creates an RDS instance", 
+
+     "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "RDS Configuration"
+                    },
+                    "Parameters": [
+                     "VPC",
+                        "DBAllocatedStorage",
+                        "DBInstanceClass",
+                        "DBUser",
+                        "DBPassword",
+                        "SecurityGroupId",
+                        "DBSubnetGroupName"                   
+                    ]
+                }
+            ],
+
+            "ParameterLabels": {
+
+                "DBAllocatedStorage": {
+                    "default": "Storage to be allocated to the RDS"
+                },
+
+                "DBInstanceClass": {
+                  "default": "DB Instance type"
+                },
+
+                "DBUser" : {
+                  "default": "DB username"
+                },
+
+                "DBPassword" : {
+                  "default": "DB Password"
+                },
+
+                "SecurityGroupId" : {
+                  "default": "Security Group"
+                },
+
+                "DBSubnetGroupName" : {
+                  "default": "DB Subnet Group"
+                }               
+            }
+        }
+    },
+
+    "Parameters": {
+
+        "DBAllocatedStorage": {
+            "Description": "Enter the storage to be allocated to the RDS",
+            "Type": "String"
+        },
+
+        "DBInstanceClass": {
+         "Description": "Select the appropriate instance type",
+         "Type": "String",
+         "Default": "db.t2.micro",
+         "AllowedValues": ["db.t2.micro", "db.t2.small", "db.t2.medium"],
+         "ConstraintDescription": "Must be a valid EC2 instance type"
+        },
+
+        "DBUser": {
+           "Description": "Enter the MasterUsername for the database",
+           "Type": "String"
+        },
+
+        "DBPassword": {
+           "Description": "Enter the MasterUserPassword for the database",
+           "Type": "String",
+           "NoEcho" : "True"
+        },
+
+        "SecurityGroupId": {
+          "Description" : "Select the Security Group to be used with this instance",
+          "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+
+        "DBSubnetGroupName": {
+           "Description": "Enter the database Subnet Group Name",
+           "Type": "String"
+        }
+
+
+    },   
+
+   "Resources": {
+
+      "CentauroDemoDB" : {
+         "Type" : "AWS::RDS::DBInstance",
+         "Properties" : {
+            "AllocatedStorage" : { "Ref" : "DBAllocatedStorage" },
+            "DBInstanceClass" : { "Ref" : "DBInstanceClass" },
+            "DBSubnetGroupName" : { "Ref" : "DBSubnetGroupName" },
+            "Engine" : "sqlserver-ex",
+            "EngineVersion" : "12.00.4422.0.v1",
+            "MasterUsername" : { "Ref" : "DBUser" },
+            "MasterUserPassword" : { "Ref" : "DBPassword" },
+            "VPCSecurityGroups": [{ "Ref" : "SecurityGroupId"}],
+            "Tags" : [ { "Key" : "Name", "Value" : "CentauroDemoDB" } ]
+         }
+      }
+   }
+}         
