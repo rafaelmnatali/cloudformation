@@ -5,21 +5,47 @@
 
   "Resources": {
     
-    "proyectosoftwarecontratistasrepo" : { 
+    "software-contratistas-web-repo" : { 
 		"Type" : "AWS::CodeCommit::Repository",
   			"Properties" : {
     			"RepositoryDescription" : "Proyecto Software Contratistas",
-    			"RepositoryName" : "proyecto_software_contratistas"
+    			"RepositoryName" : "software-contratistas-web"
   			}
+    },
+
+    "software-contratistas-mobile-repo" : { 
+    "Type" : "AWS::CodeCommit::Repository",
+        "Properties" : {
+          "RepositoryDescription" : "Proyecto Software Contratistas",
+          "RepositoryName" : "software-contratistas-mobile"
+        }
+    },
+
+    "software-contratistas-api-repo" : { 
+    "Type" : "AWS::CodeCommit::Repository",
+        "Properties" : {
+          "RepositoryDescription" : "Proyecto Software Contratistas",
+          "RepositoryName" : "software-contratistas-api"
+        }
     }
+
   },
 
   "Outputs": {
   	
-  	"proyectosoftwarecontratistas" : {
+  	"software-contratistas-web" : {
   		"Description" : "CloneUrlHttp",
-  		"Value" : { "Fn::GetAtt" : [ "proyectosoftwarecontratistasrepo", "CloneUrlHttp"]}
-  	}
+  		"Value" : { "Fn::GetAtt" : [ "software-contratistas-web-repo", "CloneUrlHttp"]}
+  	},
 
+    "software-contratistas-mobile" : {
+      "Description" : "CloneUrlHttp",
+      "Value" : { "Fn::GetAtt" : [ "software-contratistas-mobile-repo", "CloneUrlHttp"]}
+    },
+
+    "software-contratistas-api" : {
+      "Description" : "CloneUrlHttp",
+      "Value" : { "Fn::GetAtt" : [ "software-contratistas-api-repo", "CloneUrlHttp"]}
+    }
   }
 }
