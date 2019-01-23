@@ -1,0 +1,25 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description": "This template creates CodeCommit repositories", 
+
+  "Resources": {
+    
+    "proyectosoftwarecontratistasrepo" : { 
+		"Type" : "AWS::CodeCommit::Repository",
+  			"Properties" : {
+    			"RepositoryDescription" : "Proyecto Software Contratistas",
+    			"RepositoryName" : "proyecto_software_contratistas"
+  			}
+    }
+  },
+
+  "Outputs": {
+  	
+  	"proyectosoftwarecontratistas" : {
+  		"Description" : "CloneUrlHttp",
+  		"Value" : { "Fn::GetAtt" : [ "proyectosoftwarecontratistasrepo", "CloneUrlHttp"]}
+  	}
+
+  }
+}
