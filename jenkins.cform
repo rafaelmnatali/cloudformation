@@ -1,0 +1,79 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+
+	  "Description": "This template install and configure a Jenkins standalone server",
+
+  	  "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                    	"VPC"                   
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+            	"VpcId": {
+            		"default" : "VPC id"
+            	}              
+            }
+        }
+    },
+
+    "Parameters": {
+    	"VpcId": {
+    		"Description": "Enter the VPC where to configure OpenVPN",
+    		"Type": "List<AWS::EC2::VPC::Id>"
+    	}
+    },
+
+
+	"Resources": {
+
+		"SecurityGroupJenkins" : {
+   			"Type" : "AWS::EC2::SecurityGroup",
+   			"Properties" : {
+   				"GroupDescription" : "Allow access to Jenkins server",
+		        "VpcId" : { "Fn::Select" : [ "0", { "Ref" : "VpcId"}]},
+		        "SecurityGroupIngress" : [
+		           {
+		              "IpProtocol" : "tcp",
+		              "FromPort" : 80,
+		              "ToPort" : 80,
+		              "CidrIp" : "0.0.0.0/0"
+		           },
+		           {
+		              "IpProtocol" : "tcp",
+		              "FromPort" : 8080,
+		              "ToPort" : 8080,
+		              "CidrIp" : "0.0.0.0/0"
+		           },
+		           {
+		              "IpProtocol" : "tcp",
+		              "FromPort" : 22,
+		              "ToPort" : 22,
+		              "CidrIp" : "0.0.0.0/0"
+		           }		           
+		           ],
+		        "SecurityGroupEgress" : [{
+		           "IpProtocol" : "-1",
+		           "FromPort" : 0,
+		           "ToPort" : 65535,
+		           "CidrIp" : "0.0.0.0/0"
+		        }],
+		        "Tags" : [ {"Key" : "Project", "Value" : "Jenkins"}, { "Key" : "Name", "Value" : "sg_jenkins"}, { "Key" : "Requested By", "Value" : "Jimmy Gamboa"}]
+		    }
+		}
+	},
+    
+    "Outputs": {
+    	"SecurityGroupJenkinsOutput" : {
+    		"Description": "ID of the Security Group",
+    		"Value" : { "Fn::GetAtt" : ["SecurityGroupJenkins", "GroupId"]}
+    	}
+    }
+    	 
+}
