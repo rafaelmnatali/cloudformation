@@ -11,14 +11,37 @@
                         "default": "Network Configuration"
                     },
                     "Parameters": [
-                    	"VPC"                   
+                    	"VpcId",
+                    	"SubnetId"                   
+                    ]
+                },            
+                {
+                    "Label": {
+                        "default": "EC2 Instance Configuration"
+                    },
+                    "Parameters": [
+                    	"InstanceType",
+                        "ServerName",
+                        "LatestLinuxAMI"      
                     ]
                 }
             ],
             "ParameterLabels": {
             	"VpcId": {
             		"default" : "VPC id"
-            	}              
+            	},
+
+            	"SubnetId": {
+            		"default" : "Subnet id"
+            	},
+
+            	"ServerName" : {
+                	"default": "Server Name"
+                },
+
+                "LatestLinuxAMI" : {
+                	"default": "Latest Amazon Linux 2 AMI"
+                }              
             }
         }
     },
@@ -27,7 +50,30 @@
     	"VpcId": {
     		"Description": "Enter the VPC where to configure OpenVPN",
     		"Type": "List<AWS::EC2::VPC::Id>"
-    	}
+    	},
+
+    	"SubnetId": {
+        	"Description": "Select the Subnet to deploy the Server",
+        	"Type": "List<AWS::EC2::Subnet::Id>"
+        },
+
+        "ServerName": {
+        	"Description": "Enter the Server Name",
+        	"Type": "String"
+        },
+
+        "LatestLinuxAMI": {
+        	"Type":  "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+        	"Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+        },
+
+        "InstanceType": {
+            "Description": "Select the appropriate instance type",
+            "Type": "String",
+            "Default": "t3.micro",
+            "AllowedValues": ["t3.micro", "t3.small"],
+            "ConstraintDescription": "Must be a valid EC2 instance type"
+        }
     },
 
 
@@ -66,14 +112,64 @@
 		        }],
 		        "Tags" : [ {"Key" : "Project", "Value" : "Jenkins"}, { "Key" : "Name", "Value" : "sg_jenkins"}, { "Key" : "Requested By", "Value" : "Jimmy Gamboa"}]
 		    }
-		}
+		},
+
+		"ElasticIPaddress" : {
+			"Type" : "AWS::EC2::EIP",
+			"Properties" : {
+				"Domain" : "vpc"
+			   }
+		},
+
+		"EC2InstanceJenkins" : {
+			"Type" : "AWS::EC2::Instance",
+            "Properties" : {
+				"ImageId" : { "Ref" : "LatestLinuxAMI" },
+		            "KeyName" : "jenkins-server",
+		            "SecurityGroupIds" : [{ "Ref" : "SecurityGroupJenkins"}],
+		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
+		            "InstanceType" : { "Ref" : "InstanceType" },
+		            "UserData": {
+		                 "Fn::Base64": { "Fn::Join":["", [
+		                 "#!/bin/bash\n",
+		                 "sudo yum update –y\n",
+		                 "sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo\n",
+		                 "sudo rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key\n",
+		                 "sudo yum install jenkins java -y\n",
+		                 "sudo service jenkins start\n",
+		                 "sudo chkconfig jenkins on\n"
+		                 ]]}
+		            },
+		                    
+		            "Tags" : [ {"Key" : "Project", "Value" : "Jenkins"}, { "Key" : "Name", "Value" : { "Ref" : "ServerName" }}, { "Key" : "Requested By", "Value" : "Jimmy Gamboa"}]
+		    },
+
+		    "DependsOn" : "ElasticIPaddress"
+		},
+
+		"ElasticIPAssociation" : {
+			"Type" : "AWS::EC2::EIPAssociation",
+			"Properties" : {
+				"InstanceId" : {"Ref" : "EC2InstanceJenkins"},
+				"EIP" : {"Ref" : "ElasticIPaddress"}
+			},
+
+			"DependsOn" : "EC2InstanceJenkins"
+		}      
+
 	},
     
     "Outputs": {
+    	
     	"SecurityGroupJenkinsOutput" : {
     		"Description": "ID of the Security Group",
     		"Value" : { "Fn::GetAtt" : ["SecurityGroupJenkins", "GroupId"]}
+    	},
+
+    	"EC2InstanceJenkinsOutput" : {
+    		"Description": "Public DNS Name",
+    		"Value" : { "Fn::GetAtt" : ["EC2InstanceJenkins", "PublicDnsName"]}
     	}
     }
-    	 
+
 }
