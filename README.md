@@ -14,3 +14,4 @@ Templates OK:
 * ddns.cform - to create a serverless solution to dynamically register EC2 instances in Route53. Based on https://github.com/awslabs/aws-lambda-ddns-function
 * ec2_latestAMI - to create an EC2 instance with latest Amazon Linux 2 or Windows 2016 AMI available in the region
 * rds_demo_instance.cform - to create a RDS instance from a snapshot
+* jenkins - to create a standalone Jenkins Server
