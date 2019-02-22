@@ -1,0 +1,225 @@
+{
+	"AWSTemplateFormatVersion" : "2010-09-09",
+
+	  "Description": "This template install and configure a Jenkins standalone server",
+
+  	  "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                    	"VpcId",
+                    	"SubnetId"                   
+                    ]
+                },            
+                {
+                    "Label": {
+                        "default": "EC2 Instance Configuration"
+                    },
+                    "Parameters": [
+                    	"InstanceType",
+                        "ServerName",
+                        "LatestLinuxAMI"      
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+            	"VpcId": {
+            		"default" : "VPC id"
+            	},
+
+            	"SubnetId": {
+            		"default" : "Subnet id"
+            	},
+
+            	"ServerName" : {
+                	"default": "Server Name"
+                },
+
+                "LatestLinuxAMI" : {
+                	"default": "Latest Amazon Linux 2 AMI"
+                }              
+            }
+        }
+    },
+
+    "Parameters": {
+    	"VpcId": {
+    		"Description": "Enter the VPC where to configure OpenVPN",
+    		"Type": "List<AWS::EC2::VPC::Id>"
+    	},
+
+    	"SubnetId": {
+        	"Description": "Select the Subnet to deploy the Server",
+        	"Type": "List<AWS::EC2::Subnet::Id>"
+        },
+
+        "ServerName": {
+        	"Description": "Enter the Server Name",
+        	"Type": "String"
+        },
+
+        "LatestLinuxAMI": {
+        	"Type":  "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+        	"Default": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+        },
+
+        "InstanceType": {
+            "Description": "Select the appropriate instance type",
+            "Type": "String",
+            "Default": "t3.micro",
+            "AllowedValues": ["t3.micro", "t3.small"],
+            "ConstraintDescription": "Must be a valid EC2 instance type"
+        }
+    },
+
+
+	"Resources": {
+
+		"SecurityGroupJenkins" : {
+   			"Type" : "AWS::EC2::SecurityGroup",
+   			"Properties" : {
+   				"GroupDescription" : "Allow access to Jenkins server",
+		        "VpcId" : { "Fn::Select" : [ "0", { "Ref" : "VpcId"}]},
+		        "SecurityGroupIngress" : [
+		           {
+		              "IpProtocol" : "tcp",
+		              "FromPort" : 80,
+		              "ToPort" : 80,
+		              "CidrIp" : "0.0.0.0/0"
+		           },
+		           {
+		              "IpProtocol" : "tcp",
+		              "FromPort" : 8080,
+		              "ToPort" : 8080,
+		              "CidrIp" : "0.0.0.0/0"
+		           },
+		           {
+		              "IpProtocol" : "tcp",
+		              "FromPort" : 22,
+		              "ToPort" : 22,
+		              "CidrIp" : "0.0.0.0/0"
+		           }		           
+		           ],
+		        "SecurityGroupEgress" : [{
+		           "IpProtocol" : "-1",
+		           "FromPort" : 0,
+		           "ToPort" : 65535,
+		           "CidrIp" : "0.0.0.0/0"
+		        }],
+		        "Tags" : [ {"Key" : "Project", "Value" : "Jenkins"}, { "Key" : "Name", "Value" : "sg_jenkins"}, { "Key" : "Requested By", "Value" : "Jimmy Gamboa"}]
+		    }
+		},
+
+		"ElasticIPaddress" : {
+			"Type" : "AWS::EC2::EIP",
+			"Properties" : {
+				"Domain" : "vpc"
+			   }
+		},
+
+		"EC2InstanceJenkins" : {
+			"Type" : "AWS::EC2::Instance",
+            "Metadata" : {
+                "Comment" : "Install Jenkins Server",
+                
+                "AWS::CloudFormation::Init" : {
+                    "configSets" : {
+                        "Install" : [ "Install" ]
+                },
+
+                "Install" : {
+                    "packages" : {
+                        "yum" : {
+                            "java-1.8.0-openjdk-devel" : [],
+                            "jenkins"                  : []
+                        }
+                    },
+
+                    "services" : {
+                        "sysvinit" : {
+                            "jenkins" : {"enabled" : "true", "ensureRunning" : "true" }
+                        }
+                    }
+                }
+               }     
+           },
+
+            "Properties" : {
+				"ImageId" : { "Ref" : "LatestLinuxAMI" },
+		            "KeyName" : "jenkins-server",
+		            "SecurityGroupIds" : [{ "Ref" : "SecurityGroupJenkins"}],
+		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
+		            "InstanceType" : { "Ref" : "InstanceType" },
+		            "UserData": { 
+                        "Fn::Base64" : { "Fn::Join" : ["", [
+                        "#!/bin/bash -xe\n",
+                        "yum install -y aws-cfn-bootstrap\n",
+                        "sudo wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo\n",
+                        "sudo rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key\n",
+
+                        "# Install the files and packages from the metadata\n",
+                        "/opt/aws/bin/cfn-init -v ",
+                        "         --stack ", { "Ref" : "AWS::StackName" },
+                        "         --resource EC2InstanceJenkins ",
+                        "         --configsets Install ",
+                        "         --region ", { "Ref" : "AWS::Region" }, "\n",
+
+                         "# Signal the status from cfn-init\n",
+                         "/opt/aws/bin/cfn-signal -e $? ",
+                         "         --stack ", { "Ref" : "AWS::StackName" },
+                         "         --resource EC2InstanceJenkins ",
+                         "         --region ", { "Ref" : "AWS::Region" }, "\n"
+
+
+                    ]]}},
+		                    
+		            "Tags" : [ {"Key" : "Project", "Value" : "Jenkins"}, { "Key" : "Name", "Value" : { "Ref" : "ServerName" }}, { "Key" : "Requested By", "Value" : "Jimmy Gamboa"}]
+		    },
+
+            "CreationPolicy" : {
+                "ResourceSignal" : {
+                "Timeout" : "PT5M"
+                }
+            },
+
+		    "DependsOn" : "ElasticIPaddress"
+		},
+
+
+
+		"ElasticIPAssociation" : {
+			"Type" : "AWS::EC2::EIPAssociation",
+			"Properties" : {
+				"InstanceId" : {"Ref" : "EC2InstanceJenkins"},
+				"EIP" : {"Ref" : "ElasticIPaddress"}
+			},
+
+			"DependsOn" : "EC2InstanceJenkins"
+		}      
+
+	},
+    
+    "Outputs": {
+    	
+    	"SecurityGroupJenkinsOutput" : {
+    		"Description": "ID of the Security Group",
+    		"Value" : { "Fn::GetAtt" : ["SecurityGroupJenkins", "GroupId"]}
+    	},
+
+    	"EC2InstanceJenkinsOutput" : {
+    		"Description": "Public DNS Name",
+    		"Value" : { "Fn::GetAtt" : ["EC2InstanceJenkins", "PublicDnsName"]}
+    	},
+
+        "JenkinsURL" : {
+            "Description": "Jenkins URL",
+            "Value" : { "Fn::Join" : ["", ["http://", { "Fn::GetAtt" : ["EC2InstanceJenkins", "PublicDnsName"]}, ":8080"]]}
+        }
+
+    }
+
+}
