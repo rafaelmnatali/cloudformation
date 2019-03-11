@@ -63,7 +63,7 @@
                       ],
                       "Resource": [
                           "arn:aws:s3:::*/*",
-                          "arn:aws:s3:::daltix-s3bucket-case2s3bucket-20qkhiwnacf6"
+                          "arn:aws:s3:::daltix-s3bucket-case2s3bucket-4c7r52xngvem"
                       ]
                   },
                   {

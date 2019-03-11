@@ -121,16 +121,10 @@
 
     },
 
-    "Conditions" : {
-      "CreateLinuxEC2"   : {"Fn::Equals" : [{"Ref" : "EnvType"}, "Linux"]},
-      "CreateWindowsEC2" : {"Fn::Equals" : [{"Ref" : "EnvType"}, "Windows"]}
-    },
-
 	"Resources": {  
 
 		"LinuxEC2Instance" : {
 			"Type" : "AWS::EC2::Instance",
-            "Condition" : "CreateLinuxEC2",
 			"Properties" : {
 				"ImageId" : { "Ref" : "LatestLinuxAMI" },
 		            "KeyName" : { "Ref" : "KeyName" },
@@ -138,8 +132,21 @@
 		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
 		            "InstanceType" : { "Ref" : "InstanceType" },
                     "IamInstanceProfile" : "daltix-iamrole-case2InstanceProfile-3KTPVQ91494Y",    
-		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName"}}]
+		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName1"}}]
 		    }
+        },
 
+        "LinuxEC2Instance2" : {
+            "Type" : "AWS::EC2::Instance",
+            "Properties" : {
+                "ImageId" : { "Ref" : "LatestLinuxAMI" },
+                    "KeyName" : { "Ref" : "KeyName" },
+                    "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
+                    "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
+                    "InstanceType" : { "Ref" : "InstanceType" },
+                    "IamInstanceProfile" : "daltix-iamrole-case2InstanceProfile-3KTPVQ91494Y",    
+                    "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName2"}}]
+            }
+        }
 	}
 }	
