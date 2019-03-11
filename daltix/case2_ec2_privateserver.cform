@@ -20,6 +20,7 @@
                         "default": "EC2 Instance Configuration"
                     },
                     "Parameters": [
+                        "EnvType",
                     	"InstanceType",
                         "ServerName",
                         "SecurityGroupId",
@@ -45,8 +46,12 @@
                 	"default": "Subnet id"
                 },
 
-                "ServerName" : {
-                	"default": "Server Name"
+                "ServerName1" : {
+                	"default": "Server Name for Private Server"
+                },
+
+                "ServerName2" : {
+                    "default": "Server Name for Private Server"
                 },
 
                 "LatestLinuxAMI" : {
@@ -68,6 +73,14 @@
         }
     },
     "Parameters": {
+        "EnvType" : {
+            "Description" : "Operating System",
+            "Default" : "Linux",
+            "Type" : "String",
+            "AllowedValues" : ["Linux", "Windows"],
+            "ConstraintDescription" : "must specify Linux or Windows"
+        },
+
     	"VpcId": {
     		"Description": "Enter the VPC where to configure the Server",
     		"Type": "List<AWS::EC2::VPC::Id>"
@@ -108,45 +121,25 @@
 
     },
 
-	"Resources": {
+    "Conditions" : {
+      "CreateLinuxEC2"   : {"Fn::Equals" : [{"Ref" : "EnvType"}, "Linux"]},
+      "CreateWindowsEC2" : {"Fn::Equals" : [{"Ref" : "EnvType"}, "Windows"]}
+    },
 
-        "ElasticIPaddress" : {
-            "Type" : "AWS::EC2::EIP",
-            "Properties" : {
-                "Domain" : "vpc"
-               }
-        },      
+	"Resources": {  
 
 		"LinuxEC2Instance" : {
 			"Type" : "AWS::EC2::Instance",
+            "Condition" : "CreateLinuxEC2",
 			"Properties" : {
 				"ImageId" : { "Ref" : "LatestLinuxAMI" },
 		            "KeyName" : { "Ref" : "KeyName" },
 		            "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
 		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
-		            "InstanceType" : { "Ref" : "InstanceType" },  
+		            "InstanceType" : { "Ref" : "InstanceType" },
+                    "IamInstanceProfile" : "daltix-iamrole-case2InstanceProfile-3KTPVQ91494Y",    
 		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName"}}]
-		    },
+		    }
 
-            "DependsOn" : "ElasticIPaddress"
-        },
-
-        "ElasticIPAssociation" : {
-            "Type" : "AWS::EC2::EIPAssociation",
-            "Properties" : {
-                "InstanceId" : {"Ref" : "LinuxEC2Instance"},
-                "EIP" : {"Ref" : "ElasticIPaddress"}
-            },
-
-            "DependsOn" : "LinuxEC2Instance"
-        }
-
-	},
-
-    "Outputs": {
-        "ServerName": {
-            "Value" : { "Fn::GetAtt" : ["LinuxEC2Instance", "PublicDnsName"]},
-            "Description": "Server Name"
-        }
-    }
+	}
 }	
