@@ -1,0 +1,50 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description": "This template creates an IAM role", 
+
+    "Outputs": {
+        "RoleName": {
+            "Value": { "Ref": "case2IAMRole" },
+            "Description": "Role Name"
+        },
+ 
+        "InstanceProfileName": {
+            "Value": { "Ref": "case2InstanceProfile" },
+            "Description": "Instance Profile Name"
+        },
+
+    },
+
+  "Resources": {
+
+    "case2IAMRole" : {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+               "Version" : "2012-10-17",
+               "Statement": [ {
+                  "Effect": "Allow",
+                  "Principal": {
+                     "Service": [ "ec2.amazonaws.com" ]
+                  },
+                  "Action": [ "sts:AssumeRole" ]
+               } ]
+            },
+            "Path": "/",
+        "RoleName": "natali_daltix_ec2_role"
+      }
+    },
+
+    "case2InstanceProfile": {
+        "Type": "AWS::IAM::InstanceProfile",
+        "Properties": {
+           "Path": "/",
+           "Roles": [ {
+              "Ref": "case2IAMRole"
+           } ]
+       }
+    }    
+
+  }
+}   
