@@ -22,7 +22,8 @@
                     "Parameters": [
                         "EnvType",
                     	"InstanceType",
-                        "ServerName",
+                        "ServerName1",
+                        "ServerName2",
                         "SecurityGroupId",
                         "KeyName"       
                     ]
@@ -91,9 +92,14 @@
         	"Type": "List<AWS::EC2::Subnet::Id>"
         },
 
-        "ServerName": {
-        	"Description": "Enter the Server Name",
+        "ServerName1": {
+        	"Description": "Enter the Server Name for the first server",
         	"Type": "String"
+        },
+
+        "ServerName2": {
+            "Description": "Enter the Server Name for the second server",
+            "Type": "String"
         },
 
         "LatestLinuxAMI": {
@@ -131,7 +137,7 @@
 		            "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
 		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
 		            "InstanceType" : { "Ref" : "InstanceType" },
-                    "IamInstanceProfile" : "daltix-iamrole-case2InstanceProfile-3KTPVQ91494Y",    
+                    "IamInstanceProfile" : "daltix-role-case2InstanceProfile-PHPGE2LEYOMK",    
 		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName1"}}]
 		    }
         },
@@ -144,9 +150,10 @@
                     "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
                     "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
                     "InstanceType" : { "Ref" : "InstanceType" },
-                    "IamInstanceProfile" : "daltix-iamrole-case2InstanceProfile-3KTPVQ91494Y",    
+                    "IamInstanceProfile" : "daltix-role-case2InstanceProfile-PHPGE2LEYOMK",    
                     "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName2"}}]
             }
         }
+
 	}
 }	

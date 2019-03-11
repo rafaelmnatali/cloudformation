@@ -231,7 +231,7 @@
          "Properties" : {
                "DBSubnetGroupDescription" : "Create DBSubnetGroup for RDS",
                "DBSubnetGroupName" : "RDSDBSubnet",
-               "SubnetIds" : [ {"Ref" : "DBSubnet1" }, {"Ref" : "DBSubnet2" }],
+               "SubnetIds" : [ {"Ref" : "PublicSubnet1" }, {"Ref" : "PublicSubnet2" }],
                "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "RDSDBSubnetGroup"}]
          }    
     },
@@ -318,7 +318,7 @@
         "PortRange" : { "From" : {"Ref":"DBPortNumber"}, "To" : {"Ref":"DBPortNumber"} },
         "Egress" : "false",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet1CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet1CIDR"}
       }
     },
 
@@ -331,7 +331,7 @@
         "PortRange" : { "From" : {"Ref":"DBPortNumber"}, "To" : {"Ref":"DBPortNumber"} },
         "Egress" : "true",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet1CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet1CIDR"}
       }
     },
 
@@ -344,7 +344,7 @@
         "PortRange" : { "From" : "1024", "To" : "65535" },
         "Egress" : "false",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet1CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet1CIDR"}
       }
     },
 
@@ -357,7 +357,7 @@
         "PortRange" : { "From" : {"Ref":"DBPortNumber"}, "To" : {"Ref":"DBPortNumber"} },
         "Egress" : "true",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet1CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet1CIDR"}
       }
     },
 
@@ -370,7 +370,7 @@
         "PortRange" : { "From" : "1024", "To" : "65535" },
         "Egress" : "true",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet1CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet1CIDR"}
       }
     },
 
@@ -384,7 +384,7 @@
         "PortRange" : { "From" : {"Ref":"DBPortNumber"}, "To" : {"Ref":"DBPortNumber"} },
         "Egress" : "false",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet2CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet2CIDR"}
       }
     },
 
@@ -397,7 +397,7 @@
         "PortRange" : { "From" : "1024", "To" : "65535" },
         "Egress" : "false",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet2CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet2CIDR"}
       }
     },
 
@@ -410,7 +410,7 @@
         "PortRange" : { "From" : {"Ref":"DBPortNumber"}, "To" : {"Ref":"DBPortNumber"} },
         "Egress" : "true",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet2CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet2CIDR"}
       }
     },
 
@@ -423,7 +423,7 @@
         "PortRange" : { "From" : "1024", "To" : "65535" },
         "Egress" : "true",
         "RuleAction" : "allow",
-        "CidrBlock" : { "Ref" : "PrivateSubnet2CIDR"}
+        "CidrBlock" : { "Ref" : "PublicSubnet2CIDR"}
       }
     },
 
@@ -683,6 +683,58 @@
       }
     },
 
+    "PublicSubnetNACL80" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PublicSubnetNACL"},
+        "RuleNumber" : "400",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "80", "To" : "80" },
+        "Egress" : "false",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
+    "PublicSubnetNACL80egress" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PublicSubnetNACL"},
+        "RuleNumber" : "400",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "80", "To" : "80" },
+        "Egress" : "true",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
+    "PublicSubnetNACL3306" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PublicSubnetNACL"},
+        "RuleNumber" : "500",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "3306", "To" : "3306" },
+        "Egress" : "false",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
+    "PublicSubnetNACL3306egress" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PublicSubnetNACL"},
+        "RuleNumber" : "500",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "3306", "To" : "3306" },
+        "Egress" : "true",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
     "DatabaseSecurityGroup": {
         "Type": "AWS::EC2::SecurityGroup",
         "Properties": {
@@ -693,15 +745,15 @@
                     "IpProtocol": "6",
                     "FromPort": {"Ref":"DBPortNumber"},
                     "ToPort": {"Ref":"DBPortNumber"},
-                    "CidrIp": { "Ref": "PrivateSubnet1CIDR" },
-                    "Description": "Access to database from Private Subnet 1"
+                    "CidrIp": { "Ref": "PublicSubnet1CIDR" },
+                    "Description": "Access to database from Public Subnet 1"
                 },
                 {
                     "IpProtocol": "6",
                     "FromPort": {"Ref":"DBPortNumber"},
                     "ToPort": {"Ref":"DBPortNumber"},
-                    "CidrIp": { "Ref": "PrivateSubnet2CIDR" },
-                    "Description": "Access to database from Private Subnet 2"
+                    "CidrIp": { "Ref": "PublicSubnet2CIDR" },
+                    "Description": "Access to database from Public Subnet 2"
                 }                
             ],
             "SecurityGroupEgress": [
@@ -709,15 +761,15 @@
                     "IpProtocol": "6",
                     "FromPort": {"Ref":"DBPortNumber"},
                     "ToPort": {"Ref":"DBPortNumber"},
-                    "CidrIp": { "Ref": "PrivateSubnet1CIDR" },
-                    "Description": "Access to database from Private Subnet 1"
+                    "CidrIp": { "Ref": "PublicSubnet1CIDR" },
+                    "Description": "Access to database from Public Subnet 1"
                 },
                 {
                     "IpProtocol": "6",
                     "FromPort": {"Ref":"DBPortNumber"},
                     "ToPort": {"Ref":"DBPortNumber"},
-                    "CidrIp": { "Ref": "PrivateSubnet2CIDR" },
-                    "Description": "Access to database from Private Subnet 2"
+                    "CidrIp": { "Ref": "PublicSubnet2CIDR" },
+                    "Description": "Access to database from Public Subnet 2"
                 },                
             ],            
             "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "sg_database"}]
@@ -878,6 +930,20 @@
                     "ToPort": "22",
                     "CidrIp": "0.0.0.0/0",
                     "Description": "SSH access"
+                },
+                {
+                    "IpProtocol": "6",
+                    "FromPort": "80",
+                    "ToPort": "80",
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "HTTP access to use YUM"
+                },
+                {
+                    "IpProtocol": "6",
+                    "FromPort": {"Ref":"DBPortNumber"},
+                    "ToPort": {"Ref":"DBPortNumber"},
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "Database access"
                 },           
             ],
             "SecurityGroupEgress": [
@@ -894,6 +960,20 @@
                     "ToPort": "443",
                     "CidrIp": "0.0.0.0/0",
                     "Description": "S3 access"
+                },
+                {
+                    "IpProtocol": "6",
+                    "FromPort": "80",
+                    "ToPort": "80",
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "HTTP access to use YUM"
+                },
+                {
+                    "IpProtocol": "6",
+                    "FromPort": {"Ref":"DBPortNumber"},
+                    "ToPort": {"Ref":"DBPortNumber"},
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "Database access"
                 },   
             ],
             "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "sg_publicaccess"}]

@@ -1,0 +1,128 @@
+
+{
+   "AWSTemplateFormatVersion" : "2010-09-09",
+
+     "Description": "This template creates an RDS instance", 
+
+     "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "RDS Configuration"
+                    },
+                    "Parameters": [
+                        "DBName",
+                        "DBAllocatedStorage",
+                        "DBInstanceClass",
+                        "SecurityGroupId",
+                        "DBSubnetGroupName",
+                        "MasterUsername",
+                        "MasterPassword"                   
+                    ]
+                }
+            ],
+
+            "ParameterLabels": {
+
+                "DBName": {
+                    "default" : "Database Name"
+                },
+
+                "DBAllocatedStorage": {
+                    "default": "Storage size (Gb) to be allocated to the RDS"
+                },
+
+                "DBInstanceClass": {
+                  "default": "DB Instance type"
+                },
+
+                "SecurityGroupId" : {
+                  "default": "Security Group"
+                },
+
+                "DBSubnetGroupName" : {
+                  "default": "DB Subnet Group"
+                },
+
+                "MasterUsername" : {
+                  "default" : "Enter the master username for the database"
+                },
+
+                "MasterPassword" : {
+                  "default" : "Enter the master password for the database"
+                }               
+            }
+        }
+    },
+
+    "Parameters": {
+
+        "DBName": {
+            "Description": "Enter the name for the database",
+            "Type": "String"
+        },
+
+        "DBAllocatedStorage": {
+            "Description": "Enter the storage size (Gb) to be allocated to the RDS",
+            "Type": "String"
+        },
+
+        "DBInstanceClass": {
+         "Description": "Select the appropriate instance type",
+         "Type": "String",
+         "Default": "db.t2.micro",
+         "AllowedValues": ["db.t2.micro", "db.t2.small", "db.t2.medium"],
+         "ConstraintDescription": "Must be a valid EC2 instance type"
+        },
+
+        "SecurityGroupId": {
+          "Description" : "Select the Security Group to be used with this instance",
+          "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+
+        "DBSubnetGroupName": {
+           "Description": "Enter the database Subnet Group Name",
+           "Type": "String"
+        },
+
+        "DBMasterUsername": {
+           "Description": "Enter the master username for the database",
+           "Type": "String"
+        },
+
+        "DBMasterPassword": {
+           "Description": "Enter the master password for the database",
+           "Type": "String",
+           "NoEcho" : "true"
+        }
+
+    },   
+
+   "Resources": {
+
+      "NataliDaltixDemoDB" : {
+         "Type" : "AWS::RDS::DBInstance",
+         "Properties" : {
+            "AllocatedStorage" : { "Ref" : "DBAllocatedStorage" },
+            "BackupRetentionPeriod" : "7",
+            "DBInstanceClass" : { "Ref" : "DBInstanceClass" },
+            "DBName" : { "Ref" : "DBName"},
+            "DBSubnetGroupName" : "{ "Ref" : "DBSubnetGroupName" }",
+            "MasterUsername" : { "Ref" : "DBMasterUsername"},
+            "MasterUserPassword" : { "Ref" : "DBMasterPassword"},
+            "Engine" : "mysql",
+            "StorageType" : "gp2",
+            "VPCSecurityGroups": [{ "Ref" : "SecurityGroupId"}],
+            "Tags" : [ { "Key" : "Name", "Value" : "NataliDaltixDemoDB" } ]
+         }
+      }
+   },
+
+   "Outputs": {
+        "DBEndpoint": {
+            "Value" : { "Fn::GetAtt" : ["NataliDaltixDemoDB", "Endpoint.Address"]},
+            "Description": "Database Endpoint"
+        }
+    }
+}         

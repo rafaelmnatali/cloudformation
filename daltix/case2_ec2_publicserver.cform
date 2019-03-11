@@ -125,7 +125,7 @@
 		            "SecurityGroupIds" : [{ "Ref" : "SecurityGroupId"}],
 		            "SubnetId" : { "Fn::Select" : [ "0", { "Ref" : "SubnetId"}]},
 		            "InstanceType" : { "Ref" : "InstanceType" },
-                    "IamInstanceProfile" : "daltix-role-case2InstanceProfile-1FLST4SLX4179",  
+                    "IamInstanceProfile" : "daltix-role-case2InstanceProfile-PHPGE2LEYOMK",  
 		            "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : { "Ref" : "ServerName"}}]
 		    },
 
