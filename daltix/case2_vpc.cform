@@ -581,6 +581,58 @@
       }
     },
 
+    "PrivateSubnetNACLSubnet80" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PrivateSubnetNACL"},
+        "RuleNumber" : "600",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "80", "To" : "80" },
+        "Egress" : "false",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
+    "PrivateSubnetNACLSubnet80egress" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PrivateSubnetNACL"},
+        "RuleNumber" : "600",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "80", "To" : "80" },
+        "Egress" : "true",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
+    "PrivateSubnetNACLSubnet443" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PrivateSubnetNACL"},
+        "RuleNumber" : "700",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "80", "To" : "80" },
+        "Egress" : "false",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
+    "PrivateSubnetNACLSubnet443egress" : { 
+      "Type" : "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "NetworkAclId" : { "Ref" : "PrivateSubnetNACL"},
+        "RuleNumber" : "700",
+        "Protocol" : "6",
+        "PortRange" : { "From" : "443", "To" : "443" },
+        "Egress" : "true",
+        "RuleAction" : "allow",
+        "CidrBlock" : "0.0.0.0/0"
+      }
+    },
+
     "PublicSubnetNACL" : {
          "Type" : "AWS::EC2::NetworkAcl",
          "Properties" : {
@@ -801,29 +853,15 @@
                     "IpProtocol": "6",
                     "FromPort": "80",
                     "ToPort": "80",
-                    "CidrIp": { "Ref": "PublicSubnet1CIDR" },
-                    "Description": "Public access to port 80 from Public Subnet 1"
-                },
-                {
-                    "IpProtocol": "6",
-                    "FromPort": "80",
-                    "ToPort": "80",
-                    "CidrIp": { "Ref": "PublicSubnet2CIDR" },
-                    "Description": "Public access to port 80 from Public Subnet 2"
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "Public access to port 80 from NAT Gateway"
                 },
                 {
                     "IpProtocol": "6",
                     "FromPort": "443",
                     "ToPort": "443",
-                    "CidrIp": { "Ref": "PublicSubnet1CIDR" },
-                    "Description": "Public access to port 443 from Public Subnet 1"
-                },
-                {
-                    "IpProtocol": "6",
-                    "FromPort": "443",
-                    "ToPort": "443",
-                    "CidrIp": { "Ref": "PublicSubnet2CIDR" },
-                    "Description": "Public access to port 443 from Public Subnet 2"
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "Public access to port 443 from NAT Gateway"
                 },
                 {
                     "IpProtocol": "6",
@@ -867,29 +905,15 @@
                     "IpProtocol": "6",
                     "FromPort": "80",
                     "ToPort": "80",
-                    "CidrIp": { "Ref": "PublicSubnet1CIDR" },
-                    "Description": "Public access from port 80 to Public Subnet 1"
-                },
-                {
-                    "IpProtocol": "6",
-                    "FromPort": "80",
-                    "ToPort": "80",
-                    "CidrIp": { "Ref": "PublicSubnet2CIDR" },
-                    "Description": "Public access from port 80 to Public Subnet 2"
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "Public access from port 80 to NAT Gateway"
                 },
                 {
                     "IpProtocol": "6",
                     "FromPort": "443",
                     "ToPort": "443",
-                    "CidrIp": { "Ref": "PublicSubnet1CIDR" },
-                    "Description": "Public access from port 443 to Public Subnet 1"
-                },
-                {
-                    "IpProtocol": "6",
-                    "FromPort": "443",
-                    "ToPort": "443",
-                    "CidrIp": { "Ref": "PublicSubnet2CIDR" },
-                    "Description": "Public access from port 443 to Public Subnet 2"
+                    "CidrIp": "0.0.0.0/0",
+                    "Description": "Public access from port 443 to Public Subnet NAT Gateway"
                 },
                 {
                     "IpProtocol": "6",
@@ -980,6 +1004,31 @@
         },
       "DependsOn" : "PublicSubnetNACL"  
     },
+
+    "NAT" : {
+      "Type" : "AWS::EC2::NatGateway",
+      "Properties" : {
+        "AllocationId" : { "Fn::GetAtt" : ["NATEIP", "AllocationId"]},
+        "SubnetId" : { "Ref" : "PublicSubnet1"},
+        "Tags" : [ {"Key" : "Application", "Value" : { "Ref" : "AWS::StackId"}}, { "Key" : "Name", "Value" : "NatGateway"}]
+      }
+    },
+
+    "NATEIP" : {
+      "Type" : "AWS::EC2::EIP",
+      "Properties" : {
+        "Domain" : "vpc"
+      }
+    },
+
+    "NATRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "Properties" : {
+        "RouteTableId" : "rtb-00411f2d93aa84f5d",
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "NatGatewayId" : { "Ref" : "NAT" }
+      }
+    }
 
   }
 }   
