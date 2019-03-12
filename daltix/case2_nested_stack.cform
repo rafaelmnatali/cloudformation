@@ -1,0 +1,58 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description": "This template orchestrates the deployment for all case 2 resources",
+
+  "Resources": {
+
+  	"IAMRole": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+          "TemplateURL": "https://s3.amazonaws.com/natalicloudformation/case2_iamrole.cform",
+          "TimeoutInMinutes": "5"
+      }
+    },
+
+    "S3Bucket": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+          "TemplateURL": "https://s3.amazonaws.com/natalicloudformation/case2_s3bucket.cform",
+          "TimeoutInMinutes": "5"
+      }
+    },
+
+    "S3BucketIAMPolicy": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+          "TemplateURL": "https://s3.amazonaws.com/natalicloudformation/case2_s3bucket_policy.cform",
+          "Parameters" : {
+            "S3BucketName" : { "Fn::GetAtt" : ["S3Bucket", "Outputs.BucketName"]},
+            "S3IAMRoleName" : { "Fn::GetAtt" : ["IAMRole", "Outputs.RoleName"]}
+          },
+          "TimeoutInMinutes": "5"
+      }
+    }
+
+  },
+
+  "Outputs": {
+        "RoleName": {
+            "Value" : { "Fn::GetAtt" : ["IAMRole", "Outputs.RoleName"]},
+            "Description": "Role Name"
+        },
+
+        "IAMInstanceProfile": {
+            "Value" : { "Fn::GetAtt" : ["IAMRole", "Outputs.InstanceProfileName"]},
+            "Description": "IAM InstanceProfileName"
+        },
+
+        "S3BucketName": {
+            "Value" : { "Fn::GetAtt" : ["S3Bucket", "Outputs.BucketName"]},
+            "Description": "S3 Bucket Name"
+        }
+  }
+
+}
+
+
+

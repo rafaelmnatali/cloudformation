@@ -3,6 +3,40 @@
 
   "Description": "This template creates an IAM policy to control access to S3 bucket", 
 
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "BucketName",
+                        "RoleName"                      
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "BucketName": {
+                    "default": "Bucket Name"
+                },
+                "RoleName": {
+                    "default": "Role Name"
+                },                     
+            }
+        }
+    },
+    "Parameters": {
+        "S3BucketName": {
+            "Description": "Name of the Bucket",
+            "Type": "String"
+        },
+        "S3IAMRoleName": {
+            "Description": "Name of the Role",
+            "Type": "String"
+        }
+    },
+
   "Resources": {
     "case2S3policy" : {
        "Type": "AWS::IAM::Policy",
@@ -51,7 +85,7 @@
                       ],
                       "Resource": [
                           "arn:aws:s3:::*/*",
-                          "arn:aws:s3:::daltix-s3bucket-case2s3bucket-3nqbxnnwifop"
+                          { "Fn::Join" : [ "", [ "arn:aws:s3:::", { "Ref" : "S3BucketName"} ] ] }
                       ]
                   },
                   {
@@ -66,7 +100,7 @@
                   }
               ]
           },
-          "Roles": [ "natali_daltix_ec2_role" ]
+          "Roles": [ { "Ref" : "S3IAMRoleName"}  ]
       }
     }
   }
